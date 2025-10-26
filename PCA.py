@@ -9,10 +9,14 @@ import matplotlib.pyplot as plt
 def main():
     X, y = utils.getImages()
 
+
     print("X shape:", X.shape)
     print("y shape:", y.shape)
 
     training, test = utils.separateTrainingTest(X, int(X.shape[1]*0.85))
+
+    #training = utils.replicateImages(training, 2576)
+
 
     #Separate into training and rest 
     meanFace = utils.getAverageColumn(training)
@@ -25,18 +29,18 @@ def main():
 
 
     #standard cov matrix computation
-    stime = time.time()
+    stime = time.process_time()
     S = 1/phi.shape[1] * phi @  np.transpose(phi)
     eigvalsBig, eigvecsBig = np.linalg.eigh(S)
-    total1 = time.time() - stime
+    total1 = time.process_time() - stime
     print("Time to compute normal cov matrix + eig decomposition : " + str(total1))
-    axes = axes.flatten()
+
 
     #we do the smal one now
 
     #we compute the covariance matrix
 
-    stime = time.time()
+    stime = time.process_time()
     S = 1/phi.shape[1] *  np.transpose(phi) @ phi
     print(S.shape)
 
@@ -49,10 +53,24 @@ def main():
     eigvecs = phi @ eigvecs
     eigvecs = eigvecs / np.linalg.norm(eigvecs, axis=0)
     
-    total2 = time.time() - stime
+    total2 = time.process_time() - stime
     print("Time to compute the small cov matrix + eig decomposition : " + str(total2))
 
     print("Radio between the times : " + str(total2/total1))
+
+
+    #make the eigvalues positivr
+    for i in range(len(eigvals)):
+        if eigvals[i] < 0:
+            eigvals[i] *= -1
+            eigvecs[:,i] = eigvecs[:,i] * -1
+
+    for i in range(len(eigvalsBig)):
+        if eigvalsBig[i] < 0:
+            eigvalsBig[i] *= -1
+            eigvecsBig[:,i] = eigvecsBig[:,i] * -1
+
+
 
     #sort them
     indexes = np.argsort(eigvals)[::-1]
@@ -69,7 +87,7 @@ def main():
 
     count = 0
     for i in eigvalsBig:
-        if(i != 0):
+        if not np.isclose(i, 0, atol=1e-8):
             count += 1
 
     print("Out of " + str(len(eigvalsBig))  + " eigenvals, only " + str(count) + " are non-zero")
@@ -77,31 +95,56 @@ def main():
     #how many non_zeros ?
     count = 0
     for i in eigvals:
-        if(i != 0):
+        if not np.isclose(i, 0, atol=1e-8):
             count += 1
 
     print("Out of " + str(len(eigvals))  + " eigenvals, only " + str(count) + " are non-zero")
 
-    for i in range(20):
+    #for i in range(20):
         #utils.showImage(eigvecs[:,i], "Eigenface " + str(i))
-        #utils.show2images(eigvecsBig[:,i] - eigvecs[:,i], eigvecs[:,i] - eigvecsBig[:,i], "Small ", "Standard ")
-        utils.showImages(eigvecsBig[:, :20])
+        #utils.show2images(eigvecs[:,i],  eigvecsBig[:,i], "Small ", "Standard ") #utils.showImages(eigvecsBig[:, :20])
 
 
+    
     #check if they are the same
 
-    for i, j in zip(eigvals, eigvalsBig):
-        if i != j:
-            print("Different ! ")
+    sameEigenVals = 0
+    for i, (val_small, val_big) in enumerate(zip(eigvals, eigvalsBig)):
+        if np.isclose(val_small, val_big, atol=1e-8):
+            sameEigenVals+=1
+           
 
 
-    for i, j in zip(eigvecs, eigvecsBig):
-        if i != j:
-            print("Different ! " + i)
+    invertedEig=0
+    sameEigenVecs = 0
+    for i in range(len(eigvals)):
+        if np.allclose(eigvecs[:, i], eigvecsBig[:, i], atol=1e-8):
+            sameEigenVecs+=1
+        elif np.allclose(eigvecs[:, i], -eigvecsBig[:, i], atol=1e-8):
+            invertedEig+=1
+
+    print("They share : " + str(sameEigenVals) + " eigenvals (sorted ..) , and " + str(sameEigenVecs) + "  eigenvecs")
+    print("Of the eigvectors they don't share, " + str(invertedEig) + " are just the same but inverted")
+
+
+    #check if the sums eigvals are the same
+
+    sum1 = 0
+    for i in eigvals:
+        sum1+=i
+    sum2 = 0
+    for i in eigvalsBig:
+        sum2+=i
+    print("The trace of the AAT is : " + str(sum2) + ", and of ATA is : "  + str(sum1) )
 
 
 
+    #now we do the projections
+    
+    #how much variance do we keep?
 
+
+    representation = np.transpose(phi) @ eigenvecs
 
 
 

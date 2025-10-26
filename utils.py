@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import math
 import matplotlib.pyplot as plt
 
@@ -28,8 +29,13 @@ def getAverageColumn(X):
 
     
 def separateTrainingTest(X, nb_of_training):
+
     #todo I should shuffle
-    return X[:, :nb_of_training], X[:, nb_of_training:]
+    random.seed(10) #set the seed to be replicative
+
+    testNumber = X.shape[1] - nb_of_training
+    trainingIndexes = random.sample(range(X.shape[1]), nb_of_training)
+    return X[: ,trainingIndexes], X[: ,list(set(range(X.shape[1])) - set(trainingIndexes))]
 
 
 def show2images(x,y, title1, title2):
@@ -52,25 +58,31 @@ def show2images(x,y, title1, title2):
 
 
 def showImages(ims):
-    fig, axes = plt.subplots(math.ceil(ims.shape[1]/4), 4, figsize=(8, 4))
+    n_images = ims.shape[1]
+    n_cols = 4
+    n_rows = math.ceil(n_images / n_cols)
 
-    # Show the first image
-
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 2, n_rows * 2))
     axes = axes.flatten()
 
-    for i in range(ims.shape[1]):
-        axes[i].imshow(np.rot90(ims[:,i].reshape(46,56), k=3), 'grey')
-        #axes[i].set_title(title1)
+    for i in range(n_images):
+        img = ims[:, i].reshape(46, 56)
+        axes[i].imshow(np.rot90(img, k=3), cmap='gray')
         axes[i].axis('off')
 
-    # Adjust spacing between the plots
-    plt.tight_layout()
+    # Hide unused subplots
+    for j in range(n_images, len(axes)):
+        axes[j].axis('off')
 
+    plt.tight_layout()
     plt.show()
 
+def replicateImages(X, desired):
+    while (X.shape[1] != desired):
+        X = np.append(X, X[:,0:1], axis=1)
 
+    print("Done replicating")
 
-
-
+    return X
 
 
