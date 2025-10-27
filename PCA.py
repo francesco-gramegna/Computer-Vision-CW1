@@ -22,10 +22,14 @@ def main():
     meanFace = utils.getAverageColumn(training)
 
     #Separate the mean
-    utils.showImage(meanFace, 'mean face')
+    #utils.showImage(meanFace, 'mean face')
     #now we subtract the mean
     meanMatrix = np.repeat(meanFace[:, np.newaxis], training.shape[1], axis=1)
+
     phi = training - meanMatrix
+
+    #mean analysis
+    #utils.showImages((np.array([meanFace, training[:, 113], phi[:, 113]])).T, ["mean face", "sample face", "face - mean"])
 
 
     #standard cov matrix computation
@@ -143,8 +147,39 @@ def main():
     
     #how much variance do we keep?
 
+    #plt.bar(np.arange(0,60), eigvals[:60])
+    #plt.xlabel("Eigenvalues")
+    #plt.ylabel("Variance granted")
+    #plt.show()
 
-    representation = np.transpose(phi) @ eigenvecs
+    for k in range(20):
+        sum2 = 0
+        for i in range(k):
+            sum2+= eigvals[i]
+        print("The explained variacne of the first " + str(k) + " eigenvectors is of " + str(sum2/sum1) + "%")
+
+
+
+    eigIndexes = [3,25,125]
+    imageToPick = 113
+    recons = [training[:,imageToPick]]
+    titles = ["original (d = 2576)"]
+    for i in range(len(eigIndexes)):
+        tempEigvec = eigvecs[:, :eigIndexes[i]]
+        #conversion
+        w = np.transpose(phi[:, imageToPick]) @ tempEigvec
+        recon = meanFace + tempEigvec @ w 
+        recons.append(recon)
+
+        sum2=0
+        for j in range(eigIndexes[i]):
+            sum2+= eigvals[j]
+
+        titles.append("d = " + str(eigIndexes[i]) + ", " + f"{100*sum2/sum1:.1f}" + "%")
+
+    utils.showImages( (np.array(recons).T), titles)
+        
+
 
 
 

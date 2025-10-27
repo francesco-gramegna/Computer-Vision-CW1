@@ -57,7 +57,7 @@ def show2images(x,y, title1, title2):
     plt.show()
 
 
-def showImages(ims):
+def showImages(ims, titles):
     n_images = ims.shape[1]
     n_cols = 4
     n_rows = math.ceil(n_images / n_cols)
@@ -68,6 +68,7 @@ def showImages(ims):
     for i in range(n_images):
         img = ims[:, i].reshape(46, 56)
         axes[i].imshow(np.rot90(img, k=3), cmap='gray')
+        axes[i].set_title(titles[i])
         axes[i].axis('off')
 
     # Hide unused subplots
