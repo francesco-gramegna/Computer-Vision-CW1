@@ -68,7 +68,7 @@ def showImages(ims, titles):
     for i in range(n_images):
         img = ims[:, i].reshape(46, 56)
         axes[i].imshow(np.rot90(img, k=3), cmap='gray')
-        axes[i].set_title(titles[i])
+        axes[i].set_title(titles[i], fontsize=21)
         axes[i].axis('off')
 
     # Hide unused subplots

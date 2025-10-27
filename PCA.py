@@ -1,4 +1,5 @@
 
+import math
 import time
 import numpy as np
 import utils
@@ -147,12 +148,14 @@ def main():
     
     #how much variance do we keep?
 
-    #plt.bar(np.arange(0,60), eigvals[:60])
-    #plt.xlabel("Eigenvalues")
-    #plt.ylabel("Variance granted")
-    #plt.show()
 
-    for k in range(20):
+
+    plt.bar(np.arange(0,30), eigvals[:30])
+    plt.xlabel("Eigenvectors", fontsize=22)
+    plt.ylabel("Eigenvalues (variance granted)", fontsize=22)
+    plt.show()
+
+    for k in range(30):
         sum2 = 0
         for i in range(k):
             sum2+= eigvals[i]
@@ -163,7 +166,7 @@ def main():
     eigIndexes = [3,25,125]
     imageToPick = 113
     recons = [training[:,imageToPick]]
-    titles = ["original (d = 2576)"]
+    titles = ["original (d = 2576) \nError = 0"]
     for i in range(len(eigIndexes)):
         tempEigvec = eigvecs[:, :eigIndexes[i]]
         #conversion
@@ -175,7 +178,13 @@ def main():
         for j in range(eigIndexes[i]):
             sum2+= eigvals[j]
 
-        titles.append("d = " + str(eigIndexes[i]) + ", " + f"{100*sum2/sum1:.1f}" + "%")
+        #we define the error as eucliedian
+        error = 0
+        for a,b in zip(recon, training[:, imageToPick]):
+            error += (a-b)**2
+        error = math.sqrt(error)
+
+        titles.append("d = " + str(eigIndexes[i]) + "\n" + f"{100*sum2/sum1:.1f}%" + " Variance" + "\n" + "Error = " + f"{error:.1f}")
 
     utils.showImages( (np.array(recons).T), titles)
         
