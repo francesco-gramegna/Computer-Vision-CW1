@@ -7,12 +7,15 @@ import time
 
 def pca(phi):
 
+    stime = time.time()
     S = 1/phi.shape[1] *  np.transpose(phi) @ phi
 
     eigvals, eigvecs = np.linalg.eigh(S)
     # Compute actual eigenfaces
     eigvecs = phi @ eigvecs
     eigvecs = eigvecs / np.linalg.norm(eigvecs, axis=0)
+
+    total_time = time.time() - stime
 
     #sort? yes
 
@@ -26,13 +29,15 @@ def pca(phi):
     eigvecs = eigvecs[:,indexes]
     eigvals = eigvals[indexes]
 
-    return eigvecs, eigvals
+
+
+    return eigvecs, eigvals, total_time
 
 def big_cov(eigvecs, eigvals):
     return eigvecs @ np.diag(eigvals) @ eigvecs.T
 
 
-def fuse_pca(meanX, evecX, evalX,Cov1, N, meanY, evecY, evalY,Cov2, M):
+def fuse_pca(meanX, evecX, evalX,Cov1, N,time1, meanY, evecY, evalY,Cov2, M, time2):
 
     mean3 = (N*meanX + M*meanY)/(M+N)
     #step1 : build A : orthonrmal basis 
@@ -53,7 +58,9 @@ def fuse_pca(meanX, evecX, evalX,Cov1, N, meanY, evecY, evalY,Cov2, M):
 
     B = PHI.T @ Cov3 @ PHI
 
+    stime = time.time()
     Bvals, Bvecs = np.linalg.eigh(B)
+    end_time = time.time() - stime
 
     Rot = Bvecs
 
@@ -63,7 +70,7 @@ def fuse_pca(meanX, evecX, evalX,Cov1, N, meanY, evecY, evalY,Cov2, M):
 
     W = PHI @ Rot
 
-    return (mean3, W, Bvals, Cov3, M+N) 
+    return (mean3, W, Bvals, Cov3, M+N, time1+time2+end_time) 
 
 
 
@@ -72,12 +79,12 @@ def initial_pca(X):
     meanMatrix = np.repeat(mean0[:, np.newaxis], X.shape[1], axis=1)
 
     phi0 = X - meanMatrix
-    vec0, val0 = pca(phi0) 
+    vec0, val0, time = pca(phi0) 
     N0 = phi0.shape[1]
 
     cov = big_cov(vec0, val0)
 
-    return mean0, vec0, val0, cov, X.shape[1]
+    return mean0, vec0, val0, cov, X.shape[1], time
 
     
 
@@ -100,7 +107,7 @@ def main():
     pca02 = fuse_pca(*pca01, *pca2)
     pca03 = fuse_pca(*pca02, *pca3)
 
-    mean, vec, val, cov, tot = pca03
+    mean, vec, val, cov, tot, total_time = pca03
 
 
 
@@ -114,16 +121,14 @@ def main():
 
     #compute training representation
 
+    meanBig, bigVec, bigVal, _, _ , endTimeBig = initial_pca(training) #we compute the big pca so that we can compare
+
+    print("The time for the eigendecompositions took " + str(total_time))
+    print("The time for the eigendecompositions of the normal PCA took " + str(endTimeBig))
     
+    bestNumberForIPCA, results = utils.findBestK(phiTest, mean, vec)
 
-    meanBig, bigVec, bigVal, _, _ = initial_pca(training) #we compute the big pca so that we can compare
-    
-    #bestNumberForIPCA, results = utils.findBestK(phiTest, mean, vec)
-
-    #bestNumberForPCA , resultsPCA = utils.findBestK(phiTest, meanBig, bigVec)
-
-    bestNumberForIPCA = 10
-    bestNumberForPCA = 10
+    bestNumberForPCA , resultsPCA = utils.findBestK(phiTest, meanBig, bigVec)
 
     
     vecKept = vec[:, :bestNumberForIPCA]
@@ -135,7 +140,6 @@ def main():
     meanMatrix = np.repeat(mean[:, np.newaxis], phiTraining.shape[1], axis=1)
     R = meanMatrix + vecKept @ W
 
-    
     utils.show2images(training[:,0],R[:,0], "", "")
 
     classifierIPCA = NN.NNPCAClassifier(W, trainingY, mean, vecKept)
@@ -143,11 +147,31 @@ def main():
     W = bigVecKept.T @ phiTraining
     classifierPCA = NN.NNPCAClassifier(W, trainingY, meanBig, bigVecKept)
 
+    
+
+    meanSmall, vecSmall, valSmall, _, _ = pca01
+
+    meanMatrix = np.repeat(meanSmall[:, np.newaxis], training.shape[1], axis=1)
+    phiTrainingSmall = training - meanMatrix
+
+    vecSmallKept = vecSmall[:, :bestNumberForIPCA]
+    W = vecSmallKept.T @ phiTraining 
+
+    classifierIPCASmall = NN.NNPCAClassifier(W, trainingY, meanSmall, vecSmallKept)
+
     ipca_accuracy = utils.findTestAccuracy(classifierIPCA, test, testY)
 
     pca_accuracy = utils.findTestAccuracy(classifierPCA, test,testY)
 
+    ipcasmall_accuracy = utils.findTestAccuracy(classifierIPCASmall, test,testY)
+
     print("IPCA : " + str(ipca_accuracy))
+    print("IPCA Small : " + str(ipcasmall_accuracy))
     print("PCA : " + str(pca_accuracy))
+
+
+    #analysis of difference in the eigenvectors
+
+
 
 main()
