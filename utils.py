@@ -35,7 +35,46 @@ def separateTrainingTest(X, nb_of_training):
 
     testNumber = X.shape[1] - nb_of_training
     trainingIndexes = random.sample(range(X.shape[1]), nb_of_training)
+
+    print(trainingIndexes[113])
     return X[: ,trainingIndexes], X[: ,list(set(range(X.shape[1])) - set(trainingIndexes))]
+
+
+def separateTrainingTestQ1(X, y):
+    trainingIndexes = []
+    testIndexes = []
+    random.seed(12)
+    for i in range(0,X.shape[1],10):
+        samples = random.sample(range(10), 8)
+        for j in range(len(samples)):
+            samples[j]+=i
+        trainingIndexes += samples
+
+    print(len(trainingIndexes))
+    return X[: ,trainingIndexes], X[: ,list(set(range(X.shape[1])) - set(trainingIndexes))], y[:,trainingIndexes], y[:, list(set(range(X.shape[1])) - set(trainingIndexes))]
+
+
+
+def separateTrainingTestQ2(X, y):
+    random.seed(34)
+
+    indexes = [[] for i in range(4)] 
+    
+    for i in range(0,X.shape[1],8):
+
+        temp = []
+        for j in range(4):
+            samples = random.sample(list(set(range(8)) - set(temp)), 2)
+            temp += samples[:]
+
+            for t in range(len(samples)):
+                samples[t]+=i
+            indexes[j] += samples
+
+    return ([X[:,indexes[0]] , X[:,indexes[1]], X[:,indexes[2]], X[:,indexes[3]]],
+            [y[:,indexes[0]], y[:,indexes[1]], y[:,indexes[2]], y[:,indexes[3]]])
+
+
 
 
 def show2images(x,y, title1, title2):

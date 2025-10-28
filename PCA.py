@@ -14,7 +14,7 @@ def main():
     print("X shape:", X.shape)
     print("y shape:", y.shape)
 
-    training, test = utils.separateTrainingTest(X, int(X.shape[1]*0.85))
+    training, test = utils.separateTrainingTestQ1(X)
 
     #training = utils.replicateImages(training, 2576)
 
@@ -23,14 +23,14 @@ def main():
     meanFace = utils.getAverageColumn(training)
 
     #Separate the mean
-    #utils.showImage(meanFace, 'mean face')
+    utils.showImage(meanFace, 'mean face')
     #now we subtract the mean
     meanMatrix = np.repeat(meanFace[:, np.newaxis], training.shape[1], axis=1)
 
     phi = training - meanMatrix
 
     #mean analysis
-    #utils.showImages((np.array([meanFace, training[:, 113], phi[:, 113]])).T, ["mean face", "sample face", "face - mean"])
+    utils.showImages((np.array([meanFace, training[:, 355], phi[:, 355]])).T, ["mean face", "sample face", "face - mean"])
 
 
     #standard cov matrix computation
@@ -164,7 +164,7 @@ def main():
 
 
     eigIndexes = [3,25,125]
-    imageToPick = 113
+    imageToPick = 355
     recons = [training[:,imageToPick]]
     titles = ["original (d = 2576) \nError = 0"]
     for i in range(len(eigIndexes)):
