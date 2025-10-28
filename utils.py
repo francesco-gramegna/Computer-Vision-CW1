@@ -156,11 +156,9 @@ def findElbow(x, y):
 def findBestK(X, mean, vec):
     results = []
     for k in range(vec.shape[1]-1):
-        print(k)
         keptVec = vec[:,:k+1]
 
         W =  keptVec.T @ X
-        print(W.shape)
 
         #reconstruction error
 
@@ -188,17 +186,19 @@ def findBestK(X, mean, vec):
 
     plt.plot(elbow, results[elbow-1], 'rx', markersize=20, mew=2, label='elbow = ' + str(elbow))
 
-    plt.legend()
+    plt.legend(fontsize=22)
 
     plt.show()
+
+    return elbow, results
 
 
 def findTestAccuracy(classifier, testX, testY):
     total = 0
-    for i in range(textX.shape[1]):
-        if (classifier.classify(textX[:,i]) == testY[i]):
+    for i in range(testX.shape[1]):
+        if (classifier.classify(testX[:,i]) == testY[:,i]):
             total+=1
          
-    return 100*total/textX.shape[1]
+    return 100*total/testX.shape[1]
 
 

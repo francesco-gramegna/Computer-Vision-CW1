@@ -1,4 +1,6 @@
 import math
+import numpy as np
+import utils
 
 
 class NNClassifier():
@@ -8,12 +10,13 @@ class NNClassifier():
 
     def classify(self, point):
         min_dist = float('inf')
-        _class = Y[0]
+        _class = self.Y[0]
 
-        for i in range(A.shape[1]):
-            dist = mse(A[:, i], point)
+        for i in range(self.A.shape[1]):
+            dist = utils.mse(self.A[:, i], point)
             if dist < min_dist:
-                _class = Y[i]
+                _class = self.Y[:,i]
+                min_dist = dist
 
         return _class
 
@@ -29,6 +32,6 @@ class NNPCAClassifier():
 
 
     def classify(self, point):
-        point = point - mean
+        point = point - self.mean
         w = np.transpose(point) @ self.eigenvecs        
-        return self.classifier(w)
+        return self.classifier.classify(w)

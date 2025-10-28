@@ -188,8 +188,13 @@ def main():
     #utils.showImages( (np.array(recons).T), titles)
 
 
-    utils.findBestK(test, meanFace, eigvecs)
-        
+
+
+    meanMatrix = np.repeat(meanFace[:, np.newaxis], test.shape[1], axis=1)
+    phiTest = test-meanMatrix
+
+    utils.findBestK(phiTest, meanFace, eigvecs)
+    
 
 
 main()

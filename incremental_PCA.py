@@ -1,4 +1,5 @@
 import math
+import NN
 import numpy as np
 import utils
 import time
@@ -105,14 +106,48 @@ def main():
 
     meanMatrix = np.repeat(mean[:, np.newaxis], test.shape[1], axis=1)
     phiTest = test - meanMatrix
+
+    meanMatrix = np.repeat(mean[:, np.newaxis], training.shape[1], axis=1)
+    phiTraining = training - meanMatrix
+
     #utils.showImages(np.array([vec[:,0],vec[:,0], mean0, meanMerged]).T, np.array(["","", "mean0", "meanMerged"]))
 
     #compute training representation
 
     
-    utils.findBestK(phiTest, mean, vec)
+
+    meanBig, bigVec, bigVal, _, _ = initial_pca(training) #we compute the big pca so that we can compare
     
+    #bestNumberForIPCA, results = utils.findBestK(phiTest, mean, vec)
+
+    #bestNumberForPCA , resultsPCA = utils.findBestK(phiTest, meanBig, bigVec)
+
+    bestNumberForIPCA = 10
+    bestNumberForPCA = 10
 
     
+    vecKept = vec[:, :bestNumberForIPCA]
+    bigVecKept = bigVec[:,:bestNumberForPCA] 
+
+    W = vecKept.T @ phiTraining
+
+
+    meanMatrix = np.repeat(mean[:, np.newaxis], phiTraining.shape[1], axis=1)
+    R = meanMatrix + vecKept @ W
+
+    
+    utils.show2images(training[:,0],R[:,0], "", "")
+
+    classifierIPCA = NN.NNPCAClassifier(W, trainingY, mean, vecKept)
+
+    W = bigVecKept.T @ phiTraining
+    classifierPCA = NN.NNPCAClassifier(W, trainingY, meanBig, bigVecKept)
+
+    ipca_accuracy = utils.findTestAccuracy(classifierIPCA, test, testY)
+
+    pca_accuracy = utils.findTestAccuracy(classifierPCA, test,testY)
+
+    print("IPCA : " + str(ipca_accuracy))
+    print("PCA : " + str(pca_accuracy))
 
 main()
