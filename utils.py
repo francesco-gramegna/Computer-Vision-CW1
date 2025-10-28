@@ -125,4 +125,80 @@ def replicateImages(X, desired):
 
     return X
 
+def mse(x,y):
+    e = 0
+    for a,b in zip(x, y):
+        e += (a-b)**2
+    e = e/len(x)
+
+    return e 
+
+
+
+def findElbow(x, y):
+    x = np.array(x)
+    y = np.array(y)
+
+    p1 = np.array([x[0], y[0]])
+    p2 = np.array([x[-1], y[-1]])
+
+    line_vec = p2 - p1
+    line_vec_norm = line_vec / np.linalg.norm(line_vec)
+
+    vecs = np.column_stack((x - x[0], y - y[0]))
+
+    distances = np.abs(np.cross(line_vec, vecs)) / np.linalg.norm(line_vec)
+
+    idx = np.argmax(distances)
+    return x[idx]
+
+
+def findBestK(X, mean, vec):
+    results = []
+    for k in range(vec.shape[1]-1):
+        print(k)
+        keptVec = vec[:,:k+1]
+
+        W =  keptVec.T @ X
+        print(W.shape)
+
+        #reconstruction error
+
+        meanMatrix = np.repeat(mean[:, np.newaxis], X.shape[1], axis=1)
+        R = meanMatrix + keptVec @ W
+
+        #compute MSE
+
+        totalError = 0
+        for i in range(W.shape[1]):
+            totalError += mse(W[:,i], R[:,i])
+
+        totalError /= W.shape[1]
+
+        results.append(totalError)
+    print(results)
+
+    elbow = findElbow(range(1,len(results)+1), results)
+            
+    print("Best value : " + str(elbow-1))
+
+    plt.plot(range(1, len(results)+1), results) 
+    plt.xlabel("k (nb of eigenvectors)", fontsize=21)
+    plt.ylabel("MSE", fontsize=21)
+
+    plt.plot(elbow, results[elbow-1], 'rx', markersize=20, mew=2, label='elbow = ' + str(elbow))
+
+    plt.legend()
+
+    plt.show()
+
+
+def findTestAccuracy(classifier, testX, testY):
+    total = 0
+    for i in range(textX.shape[1]):
+        if (classifier.classify(textX[:,i]) == testY[i]):
+            total+=1
+         
+    return 100*total/textX.shape[1]
+
 

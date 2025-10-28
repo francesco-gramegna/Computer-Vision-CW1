@@ -1,4 +1,5 @@
 
+import NN
 import math
 import time
 import numpy as np
@@ -14,7 +15,7 @@ def main():
     print("X shape:", X.shape)
     print("y shape:", y.shape)
 
-    training, test = utils.separateTrainingTestQ1(X)
+    training, test, _,_ = utils.separateTrainingTestQ1(X, y)
 
     #training = utils.replicateImages(training, 2576)
 
@@ -163,7 +164,7 @@ def main():
 
 
 
-    eigIndexes = [3,25,125]
+    eigIndexes = [3,24,124]
     imageToPick = 355
     recons = [training[:,imageToPick]]
     titles = ["original (d = 2576) \nError = 0"]
@@ -179,17 +180,16 @@ def main():
             sum2+= eigvals[j]
 
         #we define the error as eucliedian
-        error = 0
-        for a,b in zip(recon, training[:, imageToPick]):
-            error += (a-b)**2
-        error = math.sqrt(error)
+
+        error = utils.mse(recon, training[:, imageToPick])
 
         titles.append("d = " + str(eigIndexes[i]) + "\n" + f"{100*sum2/sum1:.1f}%" + " Variance" + "\n" + "Error = " + f"{error:.1f}")
 
-    utils.showImages( (np.array(recons).T), titles)
+    #utils.showImages( (np.array(recons).T), titles)
+
+
+    utils.findBestK(test, meanFace, eigvecs)
         
-
-
 
 
 main()
