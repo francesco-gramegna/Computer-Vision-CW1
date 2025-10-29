@@ -30,7 +30,7 @@ def getAverageColumn(X):
     return avg
 
     
-def separateTrainingTest(X, nb_of_training):
+def separateTrainingTest(X,y, nb_of_training):
 
     #todo I should shuffle
     random.seed(10) #set the seed to be replicative
@@ -38,8 +38,7 @@ def separateTrainingTest(X, nb_of_training):
     testNumber = X.shape[1] - nb_of_training
     trainingIndexes = random.sample(range(X.shape[1]), nb_of_training)
 
-    print(trainingIndexes[113])
-    return X[: ,trainingIndexes], X[: ,list(set(range(X.shape[1])) - set(trainingIndexes))]
+    return X[: ,trainingIndexes],y[:, trainingIndexes], X[: ,list(set(range(X.shape[1])) - set(trainingIndexes))], y[:,list(set(range(X.shape[1])) - set(trainingIndexes))]
 
 
 def separateTrainingTestQ1(X, y):
