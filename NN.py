@@ -37,4 +37,22 @@ class NNPCAClassifier():
         return self.classifier.classify(w)
     
 
+class Committee():
+    def __init__(self, comm):
+       self.comm = comm 
+
+    def classify(self, point):
+        classes = {}
+
+        for c in self.comm:
+            h = c.classify(point)
+            h = h[0]
+            if h in classes:
+                classes[h] += 1
+            else:
+                classes[h] = 1
+
+        return np.array([max(classes, key=classes.get)])
+
+
 

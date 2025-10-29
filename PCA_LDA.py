@@ -7,10 +7,6 @@ import incremental_PCA
 from multiprocessing import Pool
 
 
-from scipy.linalg import eigh
-
-
-
 def getScatterImagesAndMean(dataX, dataY):
     means = {}
     
@@ -67,15 +63,15 @@ def fisherFace(dataX, dataY, Mpca, Mlda, SB, SW, mean):
 
     Wpca = eigvecsPCA
 
-    #A = np.linalg.pinv(Wpca.T @ SW @ Wpca) #TODO watch out here
-    #B = Wpca.T @ SB @ Wpca
+    A = np.linalg.pinv(Wpca.T @ SW @ Wpca) #TODO watch out here
+    B = Wpca.T @ SB @ Wpca
 
-    #eigvals, eigvecs = np.linalg.eig(A @ B)
+    eigvals, eigvecs = np.linalg.eig(A @ B)
     
-    Sw_pca = Wpca.T @ SW @ Wpca
-    Sb_pca = Wpca.T @ SB @ Wpca
+    #Sw_pca = Wpca.T @ SW @ Wpca
+    #Sb_pca = Wpca.T @ SB @ Wpca
 
-    eigvals, eigvecs = eigh(Sb_pca, Sw_pca)
+    #eigvals, eigvecs = eigh(Sb_pca, Sw_pca)
 
     #for i in range(len(eigvals)):
     #    if(eigvals[i] < 0):
@@ -180,7 +176,7 @@ def main():
 
     #separate test into real test and validation set
 
-    #validation, validationY, test, testY = utils.separateTrainingTest(test, testY, test.shape[1]//2) #half becomes validation and half becomes test  
+    validation, validationY, test, testY = utils.separateTrainingTest(test, testY, test.shape[1]//2) #half becomes validation and half becomes test  
 
     #rank of SB = 52
     #rank of SW = 416
@@ -206,4 +202,5 @@ def main():
 
 
 
-main()
+if __name__ == '__main__':
+    main()
