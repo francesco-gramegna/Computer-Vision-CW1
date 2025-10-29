@@ -35,3 +35,6 @@ class NNPCAClassifier():
         point = point - self.mean
         w = np.transpose(point) @ self.eigenvecs        
         return self.classifier.classify(w)
+    
+
+

@@ -95,6 +95,8 @@ def main():
 
     dataX, dataY = utils.separateTrainingTestQ2(training, trainingY)
 
+    print(dataX[0].shape)
+
     pca0 = initial_pca(dataX[0])
     pca1 = initial_pca(dataX[1])
     pca2 = initial_pca(dataX[2])
@@ -121,15 +123,17 @@ def main():
 
     #compute training representation
 
-    meanBig, bigVec, bigVal, _, _ , endTimeBig = initial_pca(training) #we compute the big pca so that we can compare
+    pcaBIG = initial_pca(training)
+    meanBig, bigVec, bigVal, _, _ , endTimeBig = pcaBIG #we compute the big pca so that we can compare
 
     print("The time for the eigendecompositions took " + str(total_time))
     print("The time for the eigendecompositions of the normal PCA took " + str(endTimeBig))
     
-    bestNumberForIPCA, results = utils.findBestK(phiTest, mean, vec)
+    #bestNumberForIPCA, results = utils.findBestK(phiTest, mean, vec)
 
-    bestNumberForPCA , resultsPCA = utils.findBestK(phiTest, meanBig, bigVec)
-
+    #bestNumberForPCA , resultsPCA = utils.findBestK(phiTest, meanBig, bigVec)
+    bestNumberForPCA = 39
+    bestNumberForIPCA = 39
     
     vecKept = vec[:, :bestNumberForIPCA]
     bigVecKept = bigVec[:,:bestNumberForPCA] 
@@ -140,7 +144,7 @@ def main():
     meanMatrix = np.repeat(mean[:, np.newaxis], phiTraining.shape[1], axis=1)
     R = meanMatrix + vecKept @ W
 
-    utils.show2images(training[:,0],R[:,0], "", "")
+    #utils.show2images(training[:,0],R[:,0], "", "")
 
     classifierIPCA = NN.NNPCAClassifier(W, trainingY, mean, vecKept)
 
@@ -149,7 +153,7 @@ def main():
 
     
 
-    meanSmall, vecSmall, valSmall, _, _ = pca01
+    meanSmall, vecSmall, valSmall, _,_, _ = pca01
 
     meanMatrix = np.repeat(meanSmall[:, np.newaxis], training.shape[1], axis=1)
     phiTrainingSmall = training - meanMatrix
@@ -169,8 +173,11 @@ def main():
     print("IPCA Small : " + str(ipcasmall_accuracy))
     print("PCA : " + str(pca_accuracy))
 
-
     #analysis of difference in the eigenvectors
+
+    results,times= utils.testDifferentKValues(104, phiTraining, trainingY, test, testY, pca0, pca01, pca02, pca03, pcaBIG)
+
+    utils.plotTestAccuracyTestQ2(104, results, times)
 
 
 

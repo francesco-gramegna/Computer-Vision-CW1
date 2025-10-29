@@ -1,4 +1,6 @@
 import numpy as np
+import time
+import NN
 import random
 import math
 import matplotlib.pyplot as plt
@@ -200,5 +202,59 @@ def findTestAccuracy(classifier, testX, testY):
             total+=1
          
     return 100*total/testX.shape[1]
+
+
+
+def testDifferentKValues(maxK,phiTrain,trainY, testX,testY,pca00,pca01,pca02, pca03, total_pca):
+    pcas = [pca00, pca01, pca02, pca03, total_pca]    
+    results = []
+    times = []
+
+
+    for k in range(1,maxK+1):
+        stime = time.time()
+        pcbs = [ NN.NNPCAClassifier(vec[:,:k].T @ phiTrain, trainY, mean, vec[:,:k]) for mean, vec, val,_, _,_ in pcas]
+        results.append(tuple([findTestAccuracy(cl, testX, testY) for cl in pcbs]))
+        endTime = time.time() - stime
+        times.append(endTime)
+
+        print(results[-1])
+    
+        
+    return results, times
+
+    
+def plotTestAccuracyTestQ2(maxK, results, times):
+    res0 = [r[0] for r in results]
+    res1 = [r[1] for r in results]
+    res2 = [r[2] for r in results]
+    res3 = [r[3] for r in results]
+    res4 = [r[4] for r in results]
+
+    fig, ax1 = plt.subplots()
+
+    ax1.plot(range(1, maxK+1), res0, 'b', label='PCA (one subset of 104 images)')
+    ax1.plot(range(1, maxK+1), res1, 'g', label='IPCA (2 subsets)')
+    ax1.plot(range(1, maxK+1), res2, 'c', label='IPCA (3 subsets)')
+    ax1.plot(range(1, maxK+1), res3, 'm', label='IPCA (4 subsets)')
+    ax1.plot(range(1, maxK+1), res4, 'r', label='PCA (all training images)')
+    ax1.set_xlabel('K=dimensions kept in the dimensionnality reduction')
+    ax1.set_ylabel('Accuracy (%)')
+    ax1.legend(loc='upper left')
+
+    ax2 = ax1.twinx()
+
+    ax2.bar(range(1, maxK+1), times, color='y', alpha=0.3, label='Total testing time (s)')
+
+    ax2.set_ylabel('Total testing time (s)')
+    ax2.legend(loc='upper right')
+
+    ax1.axvline(x=39, color='orange', linestyle=':')
+
+    ax1.text(39 + 0.5, 80, f'K=39', color='red', rotation=90, va='bottom')
+    
+    
+    plt.legend()
+    plt.show()
 
 
