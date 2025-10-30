@@ -154,6 +154,18 @@ def findElbow(x, y):
     return x[idx]
 
 
+def findMeanReconstructionError(W, mean, test):
+    err = 0
+    latent = W.T @ (test - mean[:,None])
+    R = mean[:,None] +  W @ latent
+
+    for i in range(R.shape[1]):
+        err += mse(R[:,i], test[:,i])
+
+    return err / R.shape[1]
+
+
+
 def findBestK(X, mean, vec):
     results = []
     for k in range(vec.shape[1]-1):
@@ -197,7 +209,8 @@ def findBestK(X, mean, vec):
 def findTestAccuracy(classifier, testX, testY):
     total = 0
     for i in range(testX.shape[1]):
-        if (classifier.classify(testX[:,i]) == testY[:,i]):
+        c = classifier.classify(testX[:,i])
+        if (c == testY[:,i]):
             total+=1
          
     return 100*total/testX.shape[1]

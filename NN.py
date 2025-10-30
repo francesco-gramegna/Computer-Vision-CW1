@@ -47,6 +47,7 @@ class Committee():
         for c in self.comm:
             h = c.classify(point)
             h = h[0]
+
             if h in classes:
                 classes[h] += 1
             else:

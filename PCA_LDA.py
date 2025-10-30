@@ -6,7 +6,6 @@ import utils
 import incremental_PCA
 from multiprocessing import Pool
 
-
 def getScatterImagesAndMean(dataX, dataY):
     means = {}
     
@@ -150,9 +149,9 @@ def plotAllResults(results):
     best_y = ys[max_idx[0]]
     best_x = xs[max_idx[1]]
 
-    plt.scatter(best_x, best_y, color='red', s=160, marker='x', label='Best accuracy : ' + f"{max_val:.1f}" + f"at Mpca={max_idx[1]}, Mlda={max_idx[0]}")
+    plt.scatter(best_x, best_y, color='red', s=260, marker='x', label='Best accuracy : ' + f"{max_val:.1f}" + f"at Mpca={max_idx[1]}, Mlda={max_idx[0]}")
     #plt.text(best_x, best_y, f'{max_val:.1f}', color='red', ha='left', va='bottom', fontsize=0)
-    plt.legend(loc='upper right')
+    plt.legend(loc='upper right', fontsize=24)
 
     plt.imshow(
         Z,
@@ -162,9 +161,9 @@ def plotAllResults(results):
         extent=[min(xs), max(xs), min(ys), max(ys)]
     )
     plt.colorbar(label='Accuracy %')
-    plt.xlabel('Mpca')
-    plt.ylabel('Mlda')
-    plt.title('Hyperparameter Heatmap')
+    plt.xlabel('Mpca', fontsize=24)
+    plt.ylabel('Mlda', fontsize=24)
+    plt.title('Hyperparameter Heatmap', fontsize=24)
     plt.show()
 
 
@@ -181,24 +180,28 @@ def main():
     #rank of SB = 52
     #rank of SW = 416
     
+
     SB, SW, mean = getScatterImagesAndMean(training,trainingY)
 
-    stime = time.time()
     
+
+    stime = time.time()
     W, mean, trainingPhi, SB, SW, Wpca, Wlda = fisherFace(training, trainingY, 416, 52, SB, SW, mean)
 
     classifier = NN.NNPCAClassifier(W.T @ trainingPhi, trainingY, mean, W)
 
-    #print(utils.findTestAccuracy(classifier, validation, validationY))
+
 
     end_time = time.time()-stime
+    print(utils.findTestAccuracy(classifier, validation, validationY))
+
     print(end_time)
 
-    res = checkAllParameters(416, 52, SB,SW, mean, training, trainingY, test, testY)
+    #res = checkAllParameters(416, 52, SB,SW, mean, training, trainingY, test, testY)
 
     #res = np.load("fisherface_res.npy", allow_pickle=True)
 
-    plotAllResults(res)
+    #plotAllResults(res)
 
 
 

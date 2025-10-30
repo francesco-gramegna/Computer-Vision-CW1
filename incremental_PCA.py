@@ -7,10 +7,15 @@ import time
 
 def pca(phi):
 
-    stime = time.time()
     S = 1/phi.shape[1] *  np.transpose(phi) @ phi
 
+    #print(S.shape)
+
+
+    stime = time.time()
+
     eigvals, eigvecs = np.linalg.eigh(S)
+
     # Compute actual eigenfaces
     eigvecs = phi @ eigvecs
     eigvecs = eigvecs / np.linalg.norm(eigvecs, axis=0)
@@ -57,6 +62,8 @@ def fuse_pca(meanX, evecX, evalX,Cov1, N,time1, meanY, evecY, evalY,Cov2, M, tim
     Cov3 = N/(M+N) * Cov1 + M/(M+N) * Cov2 + (N*M)/(M+N)**2 * (mean_diff @ mean_diff.T)
 
     B = PHI.T @ Cov3 @ PHI
+    print("B shape")
+    print(B.shape)
 
     stime = time.time()
     Bvals, Bvecs = np.linalg.eigh(B)
@@ -70,7 +77,7 @@ def fuse_pca(meanX, evecX, evalX,Cov1, N,time1, meanY, evecY, evalY,Cov2, M, tim
 
     W = PHI @ Rot
 
-    return (mean3, W, Bvals, Cov3, M+N, time1+time2+end_time) 
+    return (mean3, W, Bvals, Cov3, M+N, max(time1,time2) + end_time) 
 
 
 
@@ -178,6 +185,16 @@ def main():
     results,times= utils.testDifferentKValues(104, phiTraining, trainingY, test, testY, pca0, pca01, pca02, pca03, pcaBIG)
 
     utils.plotTestAccuracyTestQ2(104, results, times)
+
+    #tesing the different reconstruction error for k = 38
+
+    pcas = [pca0, pca01,pca02,pca03, pcaBIG]
+
+    for pca in pcas:
+        mean, W, _, _,_, _ = pca
+        W = W[:, :38]
+        print("Reconstruction error : " + str(utils.findMeanReconstructionError(W,mean,training)))
+
 
 
 
