@@ -41,11 +41,15 @@ class Committee():
     def __init__(self, comm):
        self.comm = comm 
 
-    def classify(self, point):
+    def classify(self, point, reality):
         classes = {}
 
+        individualTrue = 0
         for c in self.comm:
             h = c.classify(point)
+            if(h == reality):
+
+                individualTrue+=1
             h = h[0]
 
             if h in classes:
@@ -53,7 +57,7 @@ class Committee():
             else:
                 classes[h] = 1
 
-        return np.array([max(classes, key=classes.get)])
+        return np.array([max(classes, key=classes.get)]), individualTrue / len(self.comm)
 
 
 

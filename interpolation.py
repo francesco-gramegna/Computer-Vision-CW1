@@ -16,8 +16,8 @@ def main():
 
     #we now mant to create the intermediary results using the first two images
 
-    W1 = W[:,42]
-    W2 = W[:,507]
+    W1 = W[:,99]
+    W2 = W[:,519]
 
     inters = np.array([x * W1 + (1-x) * W2 for x in np.linspace(0, 1, 10)]).T
 

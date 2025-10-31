@@ -111,6 +111,18 @@ def main():
 
     #add pca1 to pca0
 
+    trucation = 104
+
+    pca0 = list(pca0)
+    pca1 = list(pca1)
+    pca2 = list(pca2)
+    pca3 = list(pca3)
+
+    pca0[1] = pca0[1][:, :trucation]
+    pca1[1] = pca1[1][:, :trucation]
+    pca2[1] = pca2[1][:, :trucation]
+    pca3[1] = pca3[1][:, :trucation]
+    
 
     pca01 = fuse_pca(*pca0, *pca1)
     pca02 = fuse_pca(*pca01, *pca2)
@@ -182,18 +194,27 @@ def main():
 
     #analysis of difference in the eigenvectors
 
-    results,times= utils.testDifferentKValues(104, phiTraining, trainingY, test, testY, pca0, pca01, pca02, pca03, pcaBIG)
+    #results,times= utils.testDifferentKValues(104, phiTraining, trainingY, test, testY, pca0, pca01, pca02, pca03, pcaBIG)
 
-    utils.plotTestAccuracyTestQ2(104, results, times)
+    #utils.plotTestAccuracyTestQ2(104, results, times)
 
     #tesing the different reconstruction error for k = 38
 
     pcas = [pca0, pca01,pca02,pca03, pcaBIG]
 
+    recons = [test[:,10]]
+    titles = ['original', '104', '208', '316', 'ipca total', 'batch']
     for pca in pcas:
         mean, W, _, _,_, _ = pca
-        W = W[:, :38]
-        print("Reconstruction error : " + str(utils.findMeanReconstructionError(W,mean,training)))
+        W = W[:, :100]
+        #print("Reconstruction error : " + str(utils.findMeanReconstructionError(W,mean,training)))
+        X = W.T @ test[:, 10]
+        
+        R = mean + W @ X
+
+        recons.append(R) 
+
+    utils.showImages(np.array(recons).T, titles)
 
 
 

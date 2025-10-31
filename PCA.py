@@ -31,7 +31,7 @@ def main():
     phi = training - meanMatrix
 
     #mean analysis
-    utils.showImages((np.array([meanFace, training[:, 355], phi[:, 355]])).T, ["mean face", "sample face", "face - mean"])
+    #utils.showImages((np.array([meanFace, training[:, 355], phi[:, 355]])).T, ["mean face", "sample face", "face - mean"])
 
 
     #standard cov matrix computation
@@ -77,7 +77,6 @@ def main():
             eigvecsBig[:,i] = eigvecsBig[:,i] * -1
 
 
-
     #sort them
     indexes = np.argsort(eigvals)[::-1]
     eigvecs = eigvecs[:,indexes]
@@ -108,7 +107,8 @@ def main():
 
     #for i in range(20):
         #utils.showImage(eigvecs[:,i], "Eigenface " + str(i))
-        #utils.show2images(eigvecs[:,i],  eigvecsBig[:,i], "Small ", "Standard ") #utils.showImages(eigvecsBig[:, :20])
+        #utils.show2images(eigvecs[:,i],  eigvecsBig[:,i], "Small ", "Standard ")
+    utils.showImages(eigvecsBig[:, :20], [str(i) for i in range(20)])
 
 
     
@@ -166,8 +166,8 @@ def main():
 
     eigIndexes = [3,24,124]
     imageToPick = 355
-    recons = [training[:,imageToPick]]
-    titles = ["original (d = 2576) \nError = 0"]
+    recons = []
+    titles = []
     for i in range(len(eigIndexes)):
         tempEigvec = eigvecs[:, :eigIndexes[i]]
         #conversion
@@ -185,7 +185,7 @@ def main():
 
         titles.append("d = " + str(eigIndexes[i]) + "\n" + f"{100*sum2/sum1:.1f}%" + " Variance" + "\n" + "Error = " + f"{error:.1f}")
 
-    #utils.showImages( (np.array(recons).T), titles)
+    utils.showImages( (np.array(recons).T), titles)
 
 
 
@@ -193,7 +193,7 @@ def main():
     meanMatrix = np.repeat(meanFace[:, np.newaxis], test.shape[1], axis=1)
     phiTest = test-meanMatrix
 
-    utils.findBestK(phiTest, meanFace, eigvecs)
+    #utils.findBestK(phiTest, meanFace, eigvecs)
     
 
 

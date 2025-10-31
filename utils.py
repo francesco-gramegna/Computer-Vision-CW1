@@ -207,11 +207,16 @@ def findBestK(X, mean, vec):
 
 def findTestAccuracy(classifier, testX, testY):
     total = 0
+
+    totalMeanTrue = 0
     for i in range(testX.shape[1]):
-        c = classifier.classify(testX[:,i])
-        if (c == testY[:,i]):
+        c = classifier.classify(testX[:,i], testY[:,i])
+        totalMeanTrue += c[1]
+        if (c[0] == testY[:,i]):
             total+=1
          
+    print("Total mean")
+    print(totalMeanTrue / testX.shape[1])
     return 100*total/testX.shape[1]
 
 

@@ -81,6 +81,24 @@ def get_comm_machines_all_params(dataX, dataY,n, Mlda,SB,SW,mean, validation, va
     np.save("Ensemble_fisher.npy", results)
     return results
 
+
+def random_subset(data,y, size):
+    i = [random.randint(0,data.shape[1]-1) for j in range(size)]
+    return data[:,i], y[:,i]
+
+def get_comm_random_training(dataX,dataY,n):
+
+    SB, SW, mean = PCA_LDA.getScatterImagesAndMean(dataX,dataY)
+    machines = []
+    for i in range(n):
+        X,Y = random_subset(dataX,dataY,int(dataX.shape[1] // (n*3) ))
+        machines.append(get_machine(X,Y, 38,1,37, SB,SW, mean))
+
+    clas = NN.Committee(machines)
+
+    return clas
+    
+
            
 def testRandom(i):
 
@@ -124,12 +142,15 @@ def main():
         #results = pool.map(testRandom, [i for i in range(17)])
 
 
-    comm = get_committee_fast(training, trainingY, 26, 41, 57, 97, SB,SW,mean)
-    classifier = NN.Committee(comm)
+    #comm = get_committee_fast(training, trainingY, 40, 10, 57, 50, SB,SW,mean)
+    #classifier = NN.Committee(comm)
 
     # Evaluate on the validation set
+
+    classifier2 =get_comm_random_training(training,trainingY,26)
         
-    new_acc = utils.findTestAccuracy(classifier, test, testY)
+    #print(utils.findTestAccuracy(classifier, validation, validationY))
+    print(utils.findTestAccuracy(classifier2, test, testY))
         
 
     #SB, SW, mean = PCA_LDA.getScatterImagesAndMean(training,trainingY)
