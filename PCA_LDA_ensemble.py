@@ -124,9 +124,6 @@ def main():
         #results = pool.map(testRandom, [i for i in range(17)])
 
 
-
-       
-
     comm = get_committee_fast(training, trainingY, 26, 41, 57, 97, SB,SW,mean)
     classifier = NN.Committee(comm)
 

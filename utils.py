@@ -97,9 +97,8 @@ def show2images(x,y, title1, title2):
     plt.show()
 
 
-def showImages(ims, titles):
+def showImages(ims, titles, n_cols=4):
     n_images = ims.shape[1]
-    n_cols = 4
     n_rows = math.ceil(n_images / n_cols)
 
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(n_cols * 2, n_rows * 2))
